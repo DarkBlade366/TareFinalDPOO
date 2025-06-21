@@ -3,6 +3,7 @@ package runner;
 import java.awt.BorderLayout;
 
 import javax.swing.SwingUtilities;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -26,6 +27,8 @@ import java.awt.event.FocusEvent;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 
+import clases.Zoologico;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -38,7 +41,7 @@ public class Pantalla extends JFrame {
 
 	public Pantalla() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1180, 892);
+		setBounds(100, 100, 1209, 1108);
 		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -55,11 +58,11 @@ public class Pantalla extends JFrame {
 		INICIARSESION.setHorizontalAlignment(SwingConstants.CENTER);
 		INICIARSESION.setFont(new Font("Arial Black", Font.PLAIN, 40));
 		INICIARSESION.setBackground(new Color(192, 192, 192));
-		INICIARSESION.setBounds(0, 501, 1152, 42);
+		INICIARSESION.setBounds(57, 497, 1200, 42);
 		BackGraund.add(INICIARSESION);
 		
 		JLabel USUARIO = new JLabel("USUARIO");
-		USUARIO.setBounds(124, 574, 912, 50);
+		USUARIO.setBounds(0, 575, 1193, 50);
 		BackGraund.add(USUARIO);
 		USUARIO.setHorizontalAlignment(SwingConstants.CENTER);
 		USUARIO.setForeground(new Color(230, 230, 250));
@@ -71,7 +74,7 @@ public class Pantalla extends JFrame {
 		CONTRASEÑA.setForeground(new Color(230, 230, 250));
 		CONTRASEÑA.setFont(new Font("Arial Black", Font.PLAIN, 30));
 		CONTRASEÑA.setBackground(Color.LIGHT_GRAY);
-		CONTRASEÑA.setBounds(96, 658, 957, 50);
+		CONTRASEÑA.setBounds(35, 740, 1193, 50);
 		BackGraund.add(CONTRASEÑA);
 		
 		Usuario = new JTextField();
@@ -98,24 +101,29 @@ public class Pantalla extends JFrame {
 				String user = Usuario.getText();
 				String pass = String.valueOf(Contraseña.getPassword());
 				if (user.equals("Xavier Ramirez") && pass.equals("vrdThqZH")) {
-				    Zoo nueva = new Zoo();
-				    nueva.setVisible(true);
+					Zoo nueva = new Zoo();
+					nueva.setVisible(true);
 				    dispose();
 			}
 				else if (user.equals("Alex Dayan") && pass.equals("1234")) {
-				    Zoo nueva = new Zoo();
-				    nueva.setVisible(true);
+					Zoo nueva = new Zoo();
+					nueva.setVisible(true);
 				    dispose();
 				}
 				else {
 				    JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+				    Usuario.setText("Introduzca su usuario");
+				    Usuario.setForeground(new Color(169, 169, 169));
+				    Contraseña.setText("Introduzca su contraseña");
+				    Contraseña.setForeground(new Color(169, 169, 169));
+				    Contraseña.setEchoChar((char) 0);
 				}
 			}
 		});
 		ENTRAR.setBackground(new Color(255, 255, 255));
 		ENTRAR.setForeground(new Color(0, 0, 0));
-		ENTRAR.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		ENTRAR.setBounds(504, 767, 131, 36);
+		ENTRAR.setFont(new Font("Arial Black", Font.PLAIN, 20));
+		ENTRAR.setBounds(529, 938, 218, 70);
 		BackGraund.add(ENTRAR);
 		
 		Contraseña = new JPasswordField();
@@ -140,9 +148,9 @@ public class Pantalla extends JFrame {
 		Contraseña.setText("Introduzca su contraseña");
 		Contraseña.setEchoChar((char) 0);
 		Contraseña.setForeground(new Color(169, 169, 169));
-		Contraseña.setFont(new Font("Arial", Font.PLAIN, 13));
+		Contraseña.setFont(new Font("Arial", Font.PLAIN, 20));
 		Contraseña.setBackground(new Color(245, 245, 245));
-		Contraseña.setBounds(461, 710, 225, 27);
+		Contraseña.setBounds(510, 819, 272, 50);
 		BackGraund.add(Contraseña);
 		Contraseña.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
@@ -151,9 +159,9 @@ public class Pantalla extends JFrame {
 		});
 		Usuario.setText("Introduzca su usuario");
 		Usuario.setForeground(new Color(169, 169, 169));
-		Usuario.setFont(new Font("Arial", Font.PLAIN, 13));
+		Usuario.setFont(new Font("Arial", Font.PLAIN, 20));
 		Usuario.setBackground(new Color(245, 245, 245));
-		Usuario.setBounds(461, 623, 225, 27);
+		Usuario.setBounds(510, 646, 272, 50);
 		BackGraund.add(Usuario);
 		Usuario.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
@@ -162,9 +170,15 @@ public class Pantalla extends JFrame {
 		});
 		Usuario.setColumns(10);
 		
+		JLabel Logo = new JLabel("");
+		Logo.setIcon(new ImageIcon(Pantalla.class.getResource("/iimagenes/Logo 128x128_transparent.png")));
+		Logo.setBounds(1057, 0, 136, 128);
+		BackGraund.add(Logo);
+		
+		
 		JLabel ZooInicio = new JLabel("");
 		ZooInicio.setIcon(new ImageIcon(Pantalla.class.getResource("/iimagenes/zoologico-de-26-cuba-La-Habana.jpeg")));
-		ZooInicio.setBounds(0, -69, 1152, 543);
+		ZooInicio.setBounds(0, -69, 1200, 543);
 		BackGraund.add(ZooInicio);
 		
 		JLabel Raya_1 = new JLabel("");
@@ -179,7 +193,7 @@ public class Pantalla extends JFrame {
 		
 		JLabel FotoInicio = new JLabel("");
 		FotoInicio.setIcon(new ImageIcon(Pantalla.class.getResource("/iimagenes/IniciarSesion.png")));
-		FotoInicio.setBounds(0, 487, 1152, 348);
+		FotoInicio.setBounds(0, 487, 1233, 560);
 		BackGraund.add(FotoInicio);
 		
 		setLocationRelativeTo(null);
