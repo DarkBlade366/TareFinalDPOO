@@ -1,11 +1,8 @@
-package runner;
+package reportes;
 
 import java.awt.BorderLayout;
-
-import javax.swing.JScrollPane;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -15,35 +12,34 @@ import javax.swing.border.EmptyBorder;
 import clases.Zoologico;
 
 import javax.swing.JTextArea;
-import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class ReporteOcupacion extends JDialog {
+public class ReporteSalario extends JDialog {
 
-	private final JPanel contentPanel = new JPanel();	
+	private final JPanel contentPanel = new JPanel();
 
-	public ReporteOcupacion(Zoologico controlador) {
-		
-		setTitle("Reporte de Ocupación de Celdas");
+	public ReporteSalario(Zoologico controlador) {
+
+		setTitle("Reporte Salario Total");
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(null);
-		
-		
+
 		JTextArea textArea = new JTextArea();
 		textArea.setEditable(false);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		
-		JScrollPane scrollPane = new JScrollPane(textArea);
+		textArea.setBounds(0, 0, 580, 443);
+		contentPanel.add(textArea);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setBounds(0, 0, 580, 443);
-		contentPanel.add(scrollPane);
-		ArrayList<String> reporte = controlador.getReporteOcupacionCeldas();
-        for (String linea : reporte) {
-            textArea.append(linea + "\n");
-        }
+
+		double totalSalario = controlador.getSalarioTotal();
+        textArea.setText(String.format("Salario total a pagar por el zoológico:\n$ %.2f", totalSalario));
+
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
 		setLocationRelativeTo(null);
 		{
@@ -63,4 +59,5 @@ public class ReporteOcupacion extends JDialog {
 			}
 		}
 	}
+
 }

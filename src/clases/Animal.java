@@ -10,13 +10,25 @@ public class Animal {
     private LocalDate nacimiento;
     private Sexo sexo;
     private Especie especie;
+    private Celda celda;
 	
-	public Animal(int id, LocalDate nacimiento, Sexo sexo, Especie especie) {
+	public Animal(int id, LocalDate nacimiento, Sexo sexo, Especie especie, Celda celda) {
 		setId(id);
 		setNacimiento(nacimiento);
 		setSexo(sexo);
 		setEspecie(especie);
+		setCelda(celda);
 		especie.agregarAnimal(this);
+	}
+
+	public Celda getCelda() {
+		return celda;
+	}
+
+	public void setCelda(Celda celda) {
+		 if (celda == null)
+	            throw new IllegalArgumentException("La celda no puede ser nula.");
+		this.celda = celda;
 	}
 
 	public Especie getEspecie() {

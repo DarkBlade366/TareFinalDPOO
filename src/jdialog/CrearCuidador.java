@@ -1,4 +1,4 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -29,7 +29,11 @@ import javax.swing.SpinnerDateModel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
+
 import javax.swing.SpinnerNumberModel;
+
+import runner.Zoo;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -44,10 +48,13 @@ public class CrearCuidador extends JDialog {
     private JSpinner spinnerInicio;
     private JSpinner spinnerFin;
     private ArrayList<Celda> celdasDisponibles;
+    private Zoo ventanaPrincipal;
+    
 	
-	public CrearCuidador(Zoologico controlador, ArrayList<Celda> celdasDisponibles) {
+	public CrearCuidador(Zoologico controlador, ArrayList<Celda> celdasDisponibles, Zoo ventanaPrincipal) {
 		this.controlador = controlador;
 		this.celdasDisponibles = celdasDisponibles;
+	    this.ventanaPrincipal = ventanaPrincipal;
 		
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
@@ -168,9 +175,9 @@ public class CrearCuidador extends JDialog {
 
 	        int inicio = (int) spinnerInicio.getValue();
 	        int fin = (int) spinnerFin.getValue();
-	        Celda celda = (Celda) comboBoxCelda.getSelectedItem();
+	        Celda celda1 = (Celda) comboBoxCelda.getSelectedItem();
 	        
-	        if (!celda.puedeAgregarCuidador(inicio, fin)) {
+	        if (!celda1.puedeAgregarCuidador(inicio, fin)) {
 	            throw new IllegalArgumentException("Ya hay cuidadores con horarios solapados en esta celda.");
 	        }
 	        
@@ -181,7 +188,14 @@ public class CrearCuidador extends JDialog {
 
 	        Cuidador nuevo = new Cuidador(nombre, carnet, horasTrabajadas, inicio, fin);
 	        controlador.agregarTrabajador(nuevo);
-	        celda.agregarCuidador(nuevo);;
+	        celda1.agregarCuidador(nuevo);;
+	        nuevo.setCeldaAsignada1(celda1);
+	        
+			ventanaPrincipal.actualizarTablaEspecie();
+			ventanaPrincipal.actualizarResumen();
+			ventanaPrincipal.actualizarTablaCeldas();
+			ventanaPrincipal.actualizarTablaAnimales();
+			ventanaPrincipal.actualizarTablaCuidadores();
 
 	        JOptionPane.showMessageDialog(this, "Cuidador creado y asignado exitosamente.");
 	        dispose();

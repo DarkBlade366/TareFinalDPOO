@@ -5,12 +5,30 @@ public class Cuidador extends Trabajador {
 	public static double pagoPorHora = 50.0;
 	private int horaInicio;
 	private int horaFin;
+	private Celda celdaAsignada1;
+	private Celda celdaAsignada2;
 
 	public Cuidador(String nombre, String numCarnet, double horasTrabajadas, int horaInicio, int horaFin) {
 		super(nombre, numCarnet);
 		setHorasTrabajadas(horasTrabajadas);
 		setHoraInicio(horaInicio);
 		setHoraFin(horaFin);
+	}
+
+
+	public Celda getCeldaAsignada1() {
+		return celdaAsignada1;
+	}
+
+	public void setCeldaAsignada1(Celda celdaAsignada1) {
+		this.celdaAsignada1 = celdaAsignada1;
+	}
+	public Celda getCeldaAsignada2() {
+		return celdaAsignada2;
+	}
+
+	public void setCeldaAsignada2(Celda celdaAsignada2) {
+		this.celdaAsignada2 = celdaAsignada2;
 	}
 
 	public int getHoraInicio() {

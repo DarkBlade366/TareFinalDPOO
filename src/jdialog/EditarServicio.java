@@ -1,72 +1,41 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
+
+
+import java.awt.Font;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import clases.Custodio;
+import runner.Zoo;
 import clases.Servicio;
 import clases.Zoologico;
 
-import javax.swing.JLabel;
-
-import java.awt.Font;
-
-import javax.swing.JTextField;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-public class CrearServicio extends JDialog {
+public class EditarServicio extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private Zoologico controlador;
 	private JTextField textFieldNombre;
 	private JTextField textFieldCarnet;
 	private JTextField textFieldZona;
+	private Servicio servicio;
+	private Zoologico controlador;
+	private Zoo ventanaPrincipal;
 
-
-	/**
-	 * @wbp.parser.constructor
-	 */
-	public CrearServicio(Zoologico controlador) {
+	public EditarServicio(Servicio servicio, Zoologico controlador, Zoo ventanaPrincipal) {
+		this.servicio = servicio;
 		this.controlador = controlador;
-		initComponents();
-	}
-	private void crearServicio() {
-		try {
-			String nombre = textFieldNombre.getText().trim();
-			String carnet = textFieldCarnet.getText().trim();
-			String zona = textFieldZona.getText().trim();
-
-			if (nombre.isEmpty() || carnet.isEmpty() || zona.isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Debe llenar todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
-			Servicio servicio = new Servicio(nombre, carnet, zona);
-			controlador.agregarTrabajador(servicio);
-
-			JOptionPane.showMessageDialog(this, "Servicio creado exitosamente.");
-			dispose();
-
-		} catch (IllegalArgumentException ex) {
-			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-	public CrearServicio(Zoologico controlador, String nombre, String carnet) {
-		this.controlador = controlador;
-		initComponents();
-		textFieldNombre.setText(nombre);  
-		textFieldCarnet.setText(carnet);
-	}
-	private void initComponents(){
-
+		this.ventanaPrincipal = ventanaPrincipal;
+		
+		setTitle("Editar Servicio");
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -109,33 +78,59 @@ public class CrearServicio extends JDialog {
 			contentPanel.add(textFieldZona);
 		}
 
+		gardarCambios();
 		setLocationRelativeTo(null);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("CREAR");
-				okButton.addActionListener(new ActionListener() {
+				JButton btnGuardar = new JButton("GUARDAR");
+				btnGuardar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						crearServicio();
+						editarServicio();
 					}
 				});
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				buttonPane.add(btnGuardar, BorderLayout.EAST);
 			}
 			{
+	
+
 				JButton cancelButton = new JButton("CANCEL");
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dispose();
 					}
 				});
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
+				buttonPane.add(cancelButton, BorderLayout.WEST);
 			}
 		}
-		
 	}
+	private void editarServicio() {
+		try {
+			String nombre = textFieldNombre.getText().trim();
+			String zona = textFieldZona.getText().trim();
+
+			if (nombre.isEmpty() || zona.isEmpty()) {
+				throw new IllegalArgumentException("Todos los campos deben estar completos.");
+			}
+
+			servicio.setNombre(nombre);
+			servicio.setZona(zona);
+
+			ventanaPrincipal.actualizarTablaAnimales();
+			ventanaPrincipal.actualizarResumen();
+			ventanaPrincipal.actualizarTablaServicio();
+
+			JOptionPane.showMessageDialog(this, "Servicio actualizado correctamente.");
+			dispose();
+		} catch (IllegalArgumentException ex) {
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	private void gardarCambios() {
+		textFieldNombre.setText(servicio.getNombre());
+        textFieldCarnet.setText(servicio.getNumCarnet());
+        textFieldZona.setText(servicio.getZona());
+    }
 }

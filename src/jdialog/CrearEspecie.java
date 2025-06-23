@@ -1,4 +1,4 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -21,6 +21,7 @@ import enumes.Alimentacion;
 
 import javax.swing.DefaultComboBoxModel;
 
+import runner.Zoo;
 import clases.Especie;
 import clases.Zoologico;
 
@@ -39,10 +40,11 @@ public class CrearEspecie extends JDialog {
     private JComboBox<Alimentacion> comboBoxAlimentacion;
     private JComboBox<TipoEntorno> comboBoxTipoEntorno;
     private Zoologico controlador;
-	
+    private Zoo ventanaPrincipal;
 
-	public CrearEspecie(Zoologico controlador) {
+	public CrearEspecie(Zoologico controlador, Zoo ventanaPrincipal) {
 		this.controlador = controlador;
+		this.ventanaPrincipal = ventanaPrincipal;
 		
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
@@ -174,6 +176,13 @@ public class CrearEspecie extends JDialog {
 	        TipoEntorno tipoEntorno = (TipoEntorno) comboBoxTipoEntorno.getSelectedItem();
 
 	        controlador.agregarEspecie(nombreComun, nombreCientifico, esperanzaVida, pesoPromedio, tamano, cantidadComida, alimentacion, tipoEntorno);
+	        
+			ventanaPrincipal.actualizarTablaEspecie();
+			ventanaPrincipal.actualizarResumen();
+			ventanaPrincipal.actualizarTablaCeldas();
+			ventanaPrincipal.actualizarTablaAnimales();
+			ventanaPrincipal.actualizarTablaCuidadores();
+	        
 	        JOptionPane.showMessageDialog(this, "Especie creada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 	        dispose();
 	    } catch (NumberFormatException e) {

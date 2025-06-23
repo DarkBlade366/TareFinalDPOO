@@ -10,6 +10,19 @@ import enumes.Disponibilidad;
 import enumes.Sexo;
 import enumes.TipoEntorno;
 
+
+/*
+			ventanaPrincipal.actualizarTablaEspecie();
+			ventanaPrincipal.actualizarResumen();
+			ventanaPrincipal.actualizarTablaCeldas();
+			ventanaPrincipal.actualizarTablaAnimales();
+			ventanaPrincipal.actualizarTablaCuidadores();
+			ventanaPrincipal.actualizarTablaServicio();
+			ventanaPrincipal.actualizarTablaVeterinarios();
+			ventanaPrincipal.actualizarTablaAdministrativos();
+			ventanaPrincipal.actualizarTablaCustodio();
+*/
+
 public class Zoologico {
 	private String nombre;
 	private ArrayList<Celda> celdas;
@@ -67,14 +80,14 @@ public class Zoologico {
 	    trabajadores.add(trabajador);
 	}
 
-	public Animal agregarAnimal(int id, LocalDate nacimiento, Sexo sexo, Especie especie) {
+	public Animal agregarAnimal(int id, LocalDate nacimiento, Sexo sexo, Especie especie, Celda celda) {
 		for (Animal existente : animales) {
 	        if (existente.getId() == id) {
 	            throw new IllegalArgumentException("Ya existe un animal con el mismo ID.");
 	        }
 	    }	
 	    
-	    Animal nuevoAnimal = new Animal(id, nacimiento, sexo, especie);
+	    Animal nuevoAnimal = new Animal(id, nacimiento, sexo, especie, celda);
 	    animales.add(nuevoAnimal);
 	    return nuevoAnimal;
 	}
@@ -140,10 +153,15 @@ public class Zoologico {
 		    return celdas.remove(celda);
 		}
 
-		public boolean eliminarAnimal(Animal animal) {
+		public void eliminarAnimal(Animal animal) {
 		    if (animal == null)
-		        throw new IllegalArgumentException("El animal no puede ser nulo.");
-		    return animales.remove(animal);
+		        throw new IllegalArgumentException("Animal no puede ser nulo.");
+
+		    if (!animales.contains(animal)) return;
+
+		    animales.remove(animal);                            
+		    animal.getCelda().eliminarAnimal(animal);           
+		    animal.getEspecie().eliminarAnimal(animal);         
 		}
 
 		public boolean eliminarTrabajador(Trabajador trabajador) {
@@ -181,6 +199,9 @@ public class Zoologico {
 	    }
 	    public ArrayList<Especie> getEspecies() {
 	        return new ArrayList<>(especies);
+	    }
+	    public ArrayList<Animal> getAnimales() {
+	        return new ArrayList<>(animales);
 	    }
 	    
 	    
@@ -282,6 +303,97 @@ public class Zoologico {
 	        }
 
 	        return reporte;
+	    }
+	    public int getCantidadTrabajadores() {
+	        return trabajadores.size();
+	    }
+
+	    public int getCantidadCeldas() {
+	        return celdas.size();
+	    }
+
+	    public int getCantidadEspecies() {
+	        return especies.size();
+	    }
+
+	    public int getCantidadAnimales() {
+	        return animales.size();
+	    }
+
+	    public ArrayList<Cuidador> getCuidadores() {
+	        ArrayList<Cuidador> lista = new ArrayList<>();
+	        for (Trabajador t : trabajadores) {
+	            if (t instanceof Cuidador) {
+	                lista.add((Cuidador) t);
+	            }
+	        }
+	        return lista;
+	    }
+
+	    public ArrayList<Veterinario> getVeterinarios() {
+	        ArrayList<Veterinario> lista = new ArrayList<>();
+	        for (Trabajador t : trabajadores) {
+	            if (t instanceof Veterinario) {
+	                lista.add((Veterinario) t);
+	            }
+	        }
+	        return lista;
+	    }
+
+	    public ArrayList<Administrativo> getAdministrativos() {
+	        ArrayList<Administrativo> lista = new ArrayList<>();
+	        for (Trabajador t : trabajadores) {
+	            if (t instanceof Administrativo) {
+	                lista.add((Administrativo) t);
+	            }
+	        }
+	        return lista;
+	    }
+
+	    public ArrayList<Custodio> getCustodios() {
+	        ArrayList<Custodio> lista = new ArrayList<>();
+	        for (Trabajador t : trabajadores) {
+	            if (t instanceof Custodio) {
+	                lista.add((Custodio) t);
+	            }
+	        }
+	        return lista;
+	    }
+
+	    public ArrayList<Servicio> getServicios() {
+	        ArrayList<Servicio> lista = new ArrayList<>();
+	        for (Trabajador t : trabajadores) {
+	            if (t instanceof Servicio) {
+	                lista.add((Servicio) t);
+	            }
+	        }
+	        return lista;
+	    }
+	    public boolean eliminarCuidador(Cuidador cuidador) {
+	        if (cuidador == null) throw new IllegalArgumentException("El cuidador no puede ser nulo.");
+	        if (cuidador.getCeldaAsignada1() != null) cuidador.getCeldaAsignada1().getCuidadores().remove(cuidador);
+	        if (cuidador.getCeldaAsignada2() != null) cuidador.getCeldaAsignada2().getCuidadores().remove(cuidador);
+	        return trabajadores.remove(cuidador);
+	    }
+
+	    public boolean eliminarVeterinario(Veterinario v) {
+	        if (v == null) throw new IllegalArgumentException("El veterinario no puede ser nulo.");
+	        return trabajadores.remove(v);
+	    }
+
+	    public boolean eliminarAdministrativo(Administrativo a) {
+	        if (a == null) throw new IllegalArgumentException("El administrativo no puede ser nulo.");
+	        return trabajadores.remove(a);
+	    }
+
+	    public boolean eliminarCustodio(Custodio c) {
+	        if (c == null) throw new IllegalArgumentException("El custodio no puede ser nulo.");
+	        return trabajadores.remove(c);
+	    }
+
+	    public boolean eliminarServicio(Servicio s) {
+	        if (s == null) throw new IllegalArgumentException("El trabajador de servicio no puede ser nulo.");
+	        return trabajadores.remove(s);
 	    }
 	    
 }

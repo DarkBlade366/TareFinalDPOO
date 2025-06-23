@@ -1,4 +1,4 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -13,46 +13,36 @@ import clases.Zoologico;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 
-public class ReporteSuperpoblacionEspecie extends JDialog {
+public class ReportePercentajeCelda extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
 	private JTextArea textArea;
-
-
-	public ReporteSuperpoblacionEspecie(Zoologico controlador) {
-
-		setTitle("Especies en Riesgo de Superpoblación");
+	private JScrollPane scrollPane;
+	
+	public ReportePercentajeCelda(Zoologico controlador) {
+		
+		setTitle("Reporte Porcentaje de Celdas");
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
-		
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPanel.setLayout(new BorderLayout());
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-
-		textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		textArea.setBounds(0, 0, 580, 443);
-		contentPanel.add(textArea);
-
-		JScrollPane scrollPane = new JScrollPane(textArea);
-		contentPanel.add(scrollPane, BorderLayout.CENTER);
-		scrollPane.setBounds(0, 0, 580, 2);
-
-
-		ArrayList<String> reporteList = controlador.getReporteSuperpoblacionEspecies();
-		StringBuilder builder = new StringBuilder();
-		for (String linea : reporteList) {
-		    builder.append(linea).append("\n");
+		 contentPanel.setLayout(new BorderLayout());
+		{
+			textArea = new JTextArea();
+			textArea.setEditable(false);
+	        textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
 		}
-		textArea.setText(builder.toString());
+		String reporte = controlador.getReportePorcentajeCeldas();
+		textArea.setText(reporte);
+        {
+        	scrollPane = new JScrollPane(textArea);
+        	contentPanel.add(scrollPane, BorderLayout.CENTER);
+        }
 
-	        
 		setLocationRelativeTo(null);
 		{
 			JPanel buttonPane = new JPanel();

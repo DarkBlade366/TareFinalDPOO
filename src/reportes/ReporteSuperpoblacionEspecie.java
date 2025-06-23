@@ -1,4 +1,4 @@
-package runner;
+package reportes;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -11,36 +11,48 @@ import javax.swing.border.EmptyBorder;
 
 import clases.Zoologico;
 
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
-public class ReporteSalario extends JDialog {
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+
+public class ReporteSuperpoblacionEspecie extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
+	private JTextArea textArea;
 
-	public ReporteSalario(Zoologico controlador) {
 
-		setTitle("Reporte Salario Total");
+	public ReporteSuperpoblacionEspecie(Zoologico controlador) {
+
+		setTitle("Especies en Riesgo de Superpoblación");
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
+		
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPanel.setLayout(new BorderLayout());
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-		JTextArea textArea = new JTextArea();
-		textArea.setEditable(false);
+		textArea = new JTextArea();
+        textArea.setEditable(false);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 16));
 		textArea.setBounds(0, 0, 580, 443);
 		contentPanel.add(textArea);
 
-        JScrollPane scrollPane = new JScrollPane(textArea);
-		scrollPane.setBounds(0, 0, 580, 443);
+		JScrollPane scrollPane = new JScrollPane(textArea);
+		contentPanel.add(scrollPane, BorderLayout.CENTER);
+		scrollPane.setBounds(0, 0, 580, 2);
 
-		double totalSalario = controlador.getSalarioTotal();
-        textArea.setText(String.format("Salario total a pagar por el zoológico:\n$ %.2f", totalSalario));
 
-        getContentPane().add(scrollPane, BorderLayout.CENTER);
-		
+		ArrayList<String> reporteList = controlador.getReporteSuperpoblacionEspecies();
+		StringBuilder builder = new StringBuilder();
+		for (String linea : reporteList) {
+		    builder.append(linea).append("\n");
+		}
+		textArea.setText(builder.toString());
+
+	        
 		setLocationRelativeTo(null);
 		{
 			JPanel buttonPane = new JPanel();

@@ -65,4 +65,11 @@ public class Veterinario extends Trabajador {
 	    public ArrayList<Celda> getCeldasAtendidas() {
 	        return new ArrayList<Celda>(celdaAtencion);
 	    }
+	    public void removerCeldaAtencion(Celda celda) {
+	        if (celda == null) throw new IllegalArgumentException("La celda no puede ser nula.");
+	        celdaAtencion.remove(celda);
+	    }
+	    public void clearCeldasAtendidas() {
+	        celdaAtencion.clear();
+	    }
 }

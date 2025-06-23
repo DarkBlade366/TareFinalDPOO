@@ -1,4 +1,4 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -21,6 +21,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JTextField;
 
+import runner.Zoo;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -33,10 +35,12 @@ public class CrearAdministrador extends JDialog {
 	private JTextField textFieldPuesto;
 	private JTextField textFieldOficina;
 	private JSpinner spinnerAnosExp;
+    private Zoo ventanaPrincipal;
 
 
-	public CrearAdministrador(Zoologico controlador) {
+	public CrearAdministrador(Zoologico controlador, Zoo ventanaPrincipal) {
 		this.controlador = controlador;
+	    this.ventanaPrincipal = ventanaPrincipal;
 
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
@@ -134,7 +138,10 @@ public class CrearAdministrador extends JDialog {
 
 			Administrativo admin = new Administrativo(nombre, carnet, anosExp, puesto, oficina);
 			controlador.agregarTrabajador(admin);
-
+			
+			ventanaPrincipal.actualizarResumen();
+			ventanaPrincipal.actualizarTablaAdministrativos();
+			
 			JOptionPane.showMessageDialog(this, "Administrativo creado exitosamente.");
 			dispose();
 

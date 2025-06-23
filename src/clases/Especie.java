@@ -151,7 +151,11 @@ public class Especie{
 	}
 	
 	public ArrayList<Animal> getAnimales() {
+		
 	    return new ArrayList<Animal>(animales); 
 	} 
+	public void eliminarAnimal(Animal a) {
+	    animales.remove(a);
+	}
 }
 

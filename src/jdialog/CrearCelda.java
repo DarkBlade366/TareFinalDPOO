@@ -1,4 +1,4 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -20,6 +20,7 @@ import enumes.TipoEntorno;
 
 import javax.swing.DefaultComboBoxModel;
 
+import runner.Zoo;
 import clases.Celda;
 import clases.Zoologico;
 
@@ -34,11 +35,13 @@ public class CrearCelda extends JDialog {
     private JComboBox<Disponibilidad> comboBoxDisponibilidad;
     private JComboBox<TipoEntorno> comboBoxTipoEntorno;
     private Zoologico controlador;
+    private Zoo ventanaPrincipal;
     
     
     
-	public CrearCelda(Zoologico controlador) {
+	public CrearCelda(Zoologico controlador, Zoo ventanaPrincipal) {
 		this.controlador = controlador;
+	    this.ventanaPrincipal = ventanaPrincipal;
 		
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
@@ -131,7 +134,14 @@ public class CrearCelda extends JDialog {
 	            TipoEntorno tipoEntorno = (TipoEntorno) comboBoxTipoEntorno.getSelectedItem();
 	            
 	            controlador.agregarCelda(id, disponibilidad, capTotal, tipoEntorno);
-	            
+				
+				ventanaPrincipal.actualizarTablaEspecie();
+				ventanaPrincipal.actualizarResumen();
+				ventanaPrincipal.actualizarTablaCeldas();
+				ventanaPrincipal.actualizarTablaAnimales();
+				ventanaPrincipal.actualizarTablaCuidadores();
+				ventanaPrincipal.actualizarTablaVeterinarios();
+				
 	            JOptionPane.showMessageDialog(this, "Celda creada con éxito", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 	            dispose();
 	            

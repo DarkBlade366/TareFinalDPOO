@@ -1,4 +1,4 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -37,6 +37,8 @@ import enumes.Sexo;
 
 import javax.swing.DefaultComboBoxModel;
 
+import runner.Zoo;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -51,10 +53,12 @@ public class CrearAnimal extends JDialog {
     private JComboBox<Celda> comboBoxCelda;
     private JComboBox<Especie> comboBoxEspecie;
     private JSpinner spinner;
+    private Zoo ventanaPrincipal;
 
 
-	public CrearAnimal(Zoologico controlador) {
+	public CrearAnimal(Zoologico controlador, Zoo ventanaPrincipal) {
 		this.controlador = controlador;
+	    this.ventanaPrincipal = ventanaPrincipal;
 		
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
@@ -185,9 +189,18 @@ public class CrearAnimal extends JDialog {
 	        Date fechaDate = (Date) spinner.getValue();
 	        LocalDate nacimiento = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 	        
-	        Animal nuevoAnimal = controlador.agregarAnimal(id, nacimiento, sexo, especie);
+	        Animal nuevoAnimal = controlador.agregarAnimal(id, nacimiento, sexo, especie, celda);
+	        if (nuevoAnimal == null) throw new IllegalStateException("No se pudo crear el animal");
 
 	        celda.agregarAnimal(nuevoAnimal);
+	        nuevoAnimal.setCelda(celda);
+	        
+			ventanaPrincipal.actualizarTablaEspecie();
+			ventanaPrincipal.actualizarResumen();
+			ventanaPrincipal.actualizarTablaCeldas();
+			ventanaPrincipal.actualizarTablaAnimales();
+			ventanaPrincipal.actualizarTablaCuidadores();
+
 	        
 	        JOptionPane.showMessageDialog(this, "Animal creado exitosamente.");
 	        dispose();

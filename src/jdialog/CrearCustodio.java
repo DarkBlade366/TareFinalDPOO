@@ -1,4 +1,4 @@
-package runner;
+package jdialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 import clases.Custodio;
 import clases.Servicio;
 import clases.Zoologico;
-import runner.CrearServicio;
+import runner.Zoo;
 
 import javax.swing.JLabel;
 
@@ -41,9 +41,11 @@ public class CrearCustodio extends JDialog {
     private JCheckBox chckbxViernes;
     private JCheckBox chckbxSabado;
     private JCheckBox chckbxDomingo;
+    private Zoo ventanaPrincipal;
 	
-	public CrearCustodio(Zoologico controlador) {
+	public CrearCustodio(Zoologico controlador, Zoo ventanaPrincipal) {
 		this.controlador = controlador;
+		this.ventanaPrincipal = ventanaPrincipal;
 		
 		setBounds(100, 100, 606, 559);
 		getContentPane().setLayout(new BorderLayout());
@@ -164,20 +166,31 @@ public class CrearCustodio extends JDialog {
 	            JOptionPane.showMessageDialog(this, "Debe seleccionar al menos un día de guardia.", "Error", JOptionPane.ERROR_MESSAGE);
 	            return;
 	        }
-	        Custodio c = new Custodio(nombre, carnet, edad);
-	        c.setDiasGuardia(diasGuardia);
-
+	        if (edad <= 0 || edad > 100) {
+	            throw new IllegalArgumentException("Edad inválida.");
+	        }
 	        if (edad > 55) {
 	            JOptionPane.showMessageDialog(this, "El custodio será asignado a labores de servicio porque supera los 55 años.");
-	            dispose(); 
-	            
-	            CrearServicio crearServicioDialog = new CrearServicio(controlador, nombre, carnet);
+	            dispose();
+	            CrearServicio crearServicioDialog = new CrearServicio(controlador, ventanaPrincipal);
+	            crearServicioDialog.llenarCampos(nombre, carnet); 
 	            crearServicioDialog.setVisible(true);
+
+	            ventanaPrincipal.actualizarResumen();
+	            
 	            return;
 	        }
-	        JOptionPane.showMessageDialog(this, "Custodio creado correctamente.");
+
+	        Custodio c = new Custodio(nombre, carnet, edad);
+	        c.setDiasGuardia(diasGuardia);
 	        controlador.agregarTrabajador(c);
-	        dispose();
+
+	        JOptionPane.showMessageDialog(this, "Custodio creado correctamente.");
+	        
+	        ventanaPrincipal.actualizarResumen();
+            ventanaPrincipal.actualizarTablaCustodio();
+
+            dispose();
 
 	    } catch (IllegalArgumentException ex) {
 	        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
