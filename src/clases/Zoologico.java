@@ -21,7 +21,7 @@ import enumes.TipoEntorno;
 			ventanaPrincipal.actualizarTablaVeterinarios();
 			ventanaPrincipal.actualizarTablaAdministrativos();
 			ventanaPrincipal.actualizarTablaCustodio();
-*/
+ */
 
 public class Zoologico {
 	private String nombre;
@@ -29,14 +29,17 @@ public class Zoologico {
 	private ArrayList<Trabajador> trabajadores;
 	private ArrayList<Animal> animales;
 	private ArrayList<Especie> especies;
+	private ArrayList<Cuidador> cuidadores;
+
 	private static Zoologico zoo;
-	
+
 	private Zoologico(String nombre) {
 		setNombre(nombre);
 		celdas = new ArrayList<Celda> ();
 		trabajadores = new ArrayList<Trabajador> ();
 		animales = new ArrayList<Animal> ();
 		especies = new ArrayList<Especie> ();
+		cuidadores = new ArrayList<Cuidador> ();
 	}
 	public static Zoologico getZoo(){
 		if(zoo==null){
@@ -51,349 +54,370 @@ public class Zoologico {
 
 	public void setNombre(String nombre) {
 		if (nombre == null || nombre.trim().isEmpty())
-		    throw new IllegalArgumentException("El nombre del zoológico no puede ser vacío o nulo.");
+			throw new IllegalArgumentException("El nombre del zoológico no puede ser vacío o nulo.");
 		nombre = nombre.trim();
 		if (nombre.length() < 3 || nombre.length() > 30) {
-		    throw new IllegalArgumentException("El nombre debe tener entre 3 y 30 caracteres");		    
+			throw new IllegalArgumentException("El nombre debe tener entre 3 y 30 caracteres");		    
 		}
 		if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
-		    throw new IllegalArgumentException("El nombre solo puede contener letras y espacios");
+			throw new IllegalArgumentException("El nombre solo puede contener letras y espacios");
 		}
 		this.nombre = nombre;
 	}
-	
+
 	public void agregarCelda(String id, Disponibilidad disponibilidad, int capTotal,TipoEntorno tipoEntorno) {
-	    for (Celda existente : celdas) {
-	        if (existente.getId().equals(id)) {
-	            throw new IllegalArgumentException("Ya existe una celda con el mismo ID.");
-	        }
-	    }
-	    
-	    Celda nuevaCelda = new Celda(id, disponibilidad, capTotal, tipoEntorno);
-	    celdas.add(nuevaCelda);
+		for (Celda existente : celdas) {
+			if (existente.getId().equals(id)) {
+				throw new IllegalArgumentException("Ya existe una celda con el mismo ID.");
+			}
+		}
+
+		Celda nuevaCelda = new Celda(id, disponibilidad, capTotal, tipoEntorno);
+		celdas.add(nuevaCelda);
 	}
 	public void agregarTrabajador(Trabajador trabajador) {
-	    if (trabajador == null)
-	    	throw new IllegalArgumentException("El trabajador no puede ser nulo.");
-	    if (trabajadores.contains(trabajador))
-	        throw new IllegalArgumentException("El trabajador ya existe en el zoológico.");
-	    trabajadores.add(trabajador);
+		if (trabajador == null)
+			throw new IllegalArgumentException("El trabajador no puede ser nulo.");
+	    if (trabajador instanceof Cuidador) {
+	        throw new IllegalArgumentException("Use agregarCuidador para agregar cuidadores.");
+	    }
+		if (trabajadores.contains(trabajador))
+			throw new IllegalArgumentException("El trabajador ya existe en el zoológico.");
+		trabajadores.add(trabajador);
 	}
 
 	public Animal agregarAnimal(int id, LocalDate nacimiento, Sexo sexo, Especie especie, Celda celda) {
 		for (Animal existente : animales) {
-	        if (existente.getId() == id) {
-	            throw new IllegalArgumentException("Ya existe un animal con el mismo ID.");
-	        }
-	    }	
-	    
-	    Animal nuevoAnimal = new Animal(id, nacimiento, sexo, especie, celda);
-	    animales.add(nuevoAnimal);
-	    return nuevoAnimal;
+			if (existente.getId() == id) {
+				throw new IllegalArgumentException("Ya existe un animal con el mismo ID.");
+			}
+		}	
+
+		Animal nuevoAnimal = new Animal(id, nacimiento, sexo, especie, celda);
+		animales.add(nuevoAnimal);
+		return nuevoAnimal;
 	}
 
 	public void agregarEspecie(String nombreComun, String nombreCientifico, int esperanzaVida, double pesoPromedio, double tamano, double cantidadComida, Alimentacion alimentacion, TipoEntorno tipoEntorno) {
 		for (Especie existente : especies) {
-	        if (existente.getNombreComun().equals(nombreComun)) {
-	            throw new IllegalArgumentException("Ya existe una especie con ese nombre.");
-	        }
-	    }
-	    
-	    Especie nuevaEspecie = new Especie( esperanzaVida, nombreComun, nombreCientifico, alimentacion, tipoEntorno, tamano, pesoPromedio , cantidadComida);
-	    especies.add(nuevaEspecie);
+			if (existente.getNombreComun().equals(nombreComun)) {
+				throw new IllegalArgumentException("Ya existe una especie con ese nombre.");
+			}
+		}
+
+		Especie nuevaEspecie = new Especie( esperanzaVida, nombreComun, nombreCientifico, alimentacion, tipoEntorno, tamano, pesoPromedio , cantidadComida);
+		especies.add(nuevaEspecie);
 	}
-	
-	
+
+
 	//BUSCAR ANIMALES POR ESPECIE
 	public ArrayList<Animal> obtenerAnimalesPorEspecie(Especie especie) {
-	    ArrayList<Animal> resultado = new ArrayList<Animal>();
-	    for (Animal a : animales) {
-	        if (a.getEspecie().equals(especie)) {
-	            resultado.add(a);
-	        }
-	    }
-	    return resultado;
+		ArrayList<Animal> resultado = new ArrayList<Animal>();
+		for (Animal a : animales) {
+			if (a.getEspecie().equals(especie)) {
+				resultado.add(a);
+			}
+		}
+		return resultado;
 	}
 
 	//VERIFICAR SI UNA CELDA TIENE ESPACIO PARA UNA ESPECIE
 	public Celda encontrarCeldaDisponiblePara(Especie especie) {
-	    Celda celdaEncontrada = null;
-	    for (int i = 0; i < celdas.size() && celdaEncontrada == null; i++) {
-	        Celda c = celdas.get(i);
-	        boolean compatible = c.esCompatibleCon(especie);
-	        boolean capacidad = c.tieneCapacidad();
-	        if (compatible && capacidad) {
-	            celdaEncontrada = c;
-	        }
-	    }
-	    return celdaEncontrada;
+		Celda celdaEncontrada = null;
+		for (int i = 0; i < celdas.size() && celdaEncontrada == null; i++) {
+			Celda c = celdas.get(i);
+			boolean compatible = c.esCompatibleCon(especie);
+			boolean capacidad = c.tieneCapacidad();
+			if (compatible && capacidad) {
+				celdaEncontrada = c;
+			}
+		}
+		return celdaEncontrada;
 	}
-	
+
 	//REGISTRAR INGRESO DE NUEVO ANIMAL
 	public boolean ingresarNuevoAnimal(Animal animal) {
 		if (animal == null)
-	        throw new IllegalArgumentException("El animal no puede ser nulo.");
+			throw new IllegalArgumentException("El animal no puede ser nulo.");
 		if (!especies.contains(animal.getEspecie())) {
-	        throw new IllegalStateException("La especie del animal no está registrada en el zoológico.");
-	    }
-	    boolean ingresado = false;
-	    Celda celdaDisponible = encontrarCeldaDisponiblePara(animal.getEspecie());
-	    if (celdaDisponible != null) {
-	        celdaDisponible.agregarAnimal(animal);
-	        animales.add(animal);
-	        ingresado = true;
-	    }
-	    return ingresado;
+			throw new IllegalStateException("La especie del animal no está registrada en el zoológico.");
+		}
+		boolean ingresado = false;
+		Celda celdaDisponible = encontrarCeldaDisponiblePara(animal.getEspecie());
+		if (celdaDisponible != null) {
+			celdaDisponible.agregarAnimal(animal);
+			animales.add(animal);
+			ingresado = true;
+		}
+		return ingresado;
 	}
-	
+
 	//ELIMINACION
-		public boolean eliminarCelda(Celda celda) {
-		    if (celda == null)
-		        throw new IllegalArgumentException("La celda no puede ser nula.");
-		    return celdas.remove(celda);
+	public boolean eliminarCelda(Celda celda) {
+		if (celda == null)
+			throw new IllegalArgumentException("La celda no puede ser nula.");
+		return celdas.remove(celda);
+	}
+
+	public void eliminarAnimal(Animal animal) {
+		if (animal == null)
+			throw new IllegalArgumentException("Animal no puede ser nulo.");
+
+		if (!animales.contains(animal)) return;
+
+		animales.remove(animal);                            
+		animal.getCelda().eliminarAnimal(animal);           
+		animal.getEspecie().eliminarAnimal(animal);         
+	}
+
+	public boolean eliminarTrabajador(Trabajador trabajador) {
+		if (trabajador == null)
+			throw new IllegalArgumentException("El trabajador no puede ser nulo.");
+		 if (trabajador instanceof Cuidador) {
+		        throw new IllegalArgumentException("Use eliminarCuidador para eliminar cuidadores.");
+		    }
+		return trabajadores.remove(trabajador);
+	}
+
+	public boolean eliminarEspecie(Especie especie) {
+		if (especie == null)
+			throw new IllegalArgumentException("La especie no puede ser nula.");
+		return especies.remove(especie);
+	}
+
+	public void actualizarEdadCustodio(Custodio custodio, int nuevaEdad) {
+		try {
+			custodio.setEdad(nuevaEdad);
+		} catch (IllegalArgumentException e) {
+			if (e.getMessage().contains("debe ser asignado a labores de servicio")) {
+				Servicio servicio = convertirCustodioAServicio(custodio);
+				trabajadores.remove(custodio);
+				trabajadores.add(servicio);
+			} else {
+				throw e;
+			}
+		}
+	}
+
+	private Servicio convertirCustodioAServicio(Custodio c) {
+		return new Servicio(c.getNombre(), c.getNumCarnet(), "Zona Indefinida");
+	}
+
+	public ArrayList<Celda> getTodasLasCeldas() {
+		return new ArrayList<>(celdas);
+	}
+	public ArrayList<Especie> getEspecies() {
+		return new ArrayList<>(especies);
+	}
+	public ArrayList<Animal> getAnimales() {
+		return new ArrayList<>(animales);
+	}
+
+
+	public ArrayList<String> getReporteOcupacionCeldas() {
+		ArrayList<String> reporte = new ArrayList<>();
+		if (celdas.isEmpty()) {
+			reporte.add("No hay celdas creadas.");
+			return reporte;
 		}
 
-		public void eliminarAnimal(Animal animal) {
-		    if (animal == null)
-		        throw new IllegalArgumentException("Animal no puede ser nulo.");
+		for (Celda c : celdas) {
+			int capacidad = c.getCapacidadTotal();
+			int ocupados = c.getAnimales().size();
+			double porcentaje = capacidad == 0 ? 0 : (ocupados * 100.0 / capacidad);
 
-		    if (!animales.contains(animal)) return;
+			String linea = String.format("Celda %s: %d/%d animales (%.2f%% ocupado)",
+					c.getId(), ocupados, capacidad, porcentaje);
 
-		    animales.remove(animal);                            
-		    animal.getCelda().eliminarAnimal(animal);           
-		    animal.getEspecie().eliminarAnimal(animal);         
+			reporte.add(linea);
 		}
 
-		public boolean eliminarTrabajador(Trabajador trabajador) {
-		    if (trabajador == null)
-		        throw new IllegalArgumentException("El trabajador no puede ser nulo.");
-		    return trabajadores.remove(trabajador);
+		return reporte;
+	}
+	public double getSalarioTotal() {
+		double total = 0;
+		for (Trabajador t : trabajadores) {
+			total += t.calcularSalarioTotal();
+		}
+		return total;
+	}
+	public String getReportePorcentajeCeldas() {
+		if (celdas.isEmpty()) {
+			return "No hay celdas creadas.";
+		}
+		int total = celdas.size();
+
+		int disponibles = 0, ocupadas = 0, mantenimiento = 0;
+
+		for (Celda c : celdas) {
+			switch (c.getDisponibilidad()) {
+			case DISPONIBLE:
+				disponibles++;
+				break;
+			case OCUPADA:
+				ocupadas++;
+				break;
+			case MANTENIMIENTO:
+				mantenimiento++;
+				break;
+			}
 		}
 
-		public boolean eliminarEspecie(Especie especie) {
-		    if (especie == null)
-		        throw new IllegalArgumentException("La especie no puede ser nula.");
-		    return especies.remove(especie);
+		double pDisponibles = (disponibles * 100.0) / total;
+		double pOcupadas = (ocupadas * 100.0) / total;
+		double pMantenimiento = (mantenimiento * 100.0) / total;
+
+		return String.format(
+				"Total Celdas: %d%nDisponibles: %d (%.2f%%)%nOcupadas: %d (%.2f%%)%nEn mantenimiento: %d (%.2f%%)",
+				total, disponibles, pDisponibles, ocupadas, pOcupadas, mantenimiento, pMantenimiento);
+	}
+	public ArrayList<String> getReporteSuperpoblacionEspecies() {
+		ArrayList<String> reporte = new ArrayList<>();
+		Map<Especie, Integer> conteoPorEspecie = new HashMap<>();
+
+		for (Animal animal : animales) {
+			Especie especie = animal.getEspecie();
+			conteoPorEspecie.put(especie, conteoPorEspecie.getOrDefault(especie, 0) + 1);
 		}
-		
-	    public void actualizarEdadCustodio(Custodio custodio, int nuevaEdad) {
-	        try {
-	            custodio.setEdad(nuevaEdad);
-	        } catch (IllegalArgumentException e) {
-	            if (e.getMessage().contains("debe ser asignado a labores de servicio")) {
-	                Servicio servicio = convertirCustodioAServicio(custodio);
-	                trabajadores.remove(custodio);
-	                trabajadores.add(servicio);
-	            } else {
-	                throw e;
-	            }
-	        }
-	    }
 
-	    private Servicio convertirCustodioAServicio(Custodio c) {
-	        return new Servicio(c.getNombre(), c.getNumCarnet(), "Zona Indefinida");
-	    }
-	    
-	    public ArrayList<Celda> getTodasLasCeldas() {
-	        return new ArrayList<>(celdas);
-	    }
-	    public ArrayList<Especie> getEspecies() {
-	        return new ArrayList<>(especies);
-	    }
-	    public ArrayList<Animal> getAnimales() {
-	        return new ArrayList<>(animales);
-	    }
-	    
-	    
-	    public ArrayList<String> getReporteOcupacionCeldas() {
-	        ArrayList<String> reporte = new ArrayList<>();
-	        if (celdas.isEmpty()) {
-	            reporte.add("No hay celdas creadas.");
-	            return reporte;
-	        }
+		for (Especie especie : conteoPorEspecie.keySet()) {
+			int cantidadAnimales = conteoPorEspecie.get(especie);
+			int capacidadCompatible = 0;
 
-	        for (Celda c : celdas) {
-	            int capacidad = c.getCapacidadTotal();
-	            int ocupados = c.getAnimales().size();
-	            double porcentaje = capacidad == 0 ? 0 : (ocupados * 100.0 / capacidad);
+			for (Celda celda : celdas) {
+				if (celda.esCompatibleCon(especie)) {
+					capacidadCompatible += celda.getCapacidadTotal();
+				}
+			}
 
-	            String linea = String.format("Celda %s: %d/%d animales (%.2f%% ocupado)",
-	                c.getId(), ocupados, capacidad, porcentaje);
+			double porcentaje = capacidadCompatible == 0 ? 0 : (cantidadAnimales * 100.0 / capacidadCompatible);
+			String estado;
 
-	            reporte.add(linea);
-	        }
+			if (porcentaje <= 60) {
+				estado = "Estable";
+			} else if (porcentaje <= 85) {
+				estado = "En riesgo";
+			} else {
+				estado = "Superpoblado";
+			}
 
-	        return reporte;
-	    }
-	    public double getSalarioTotal() {
-	        double total = 0;
-	        for (Trabajador t : trabajadores) {
-	            total += t.calcularSalarioTotal();
-	        }
-	        return total;
-	    }
-	    public String getReportePorcentajeCeldas() {
-	    	 if (celdas.isEmpty()) {
-	    	        return "No hay celdas creadas.";
-	    	    }
-	        int total = celdas.size();
+			reporte.add(String.format(
+					"Especie: %s - %d animales / %d capacidad (%.2f%%) → %s",
+					especie.getNombreComun(), cantidadAnimales, capacidadCompatible, porcentaje, estado
+					));
+		}
 
-	        int disponibles = 0, ocupadas = 0, mantenimiento = 0;
+		if (reporte.isEmpty()) {
+			reporte.add("No hay animales registrados en el zoológico.");
+		}
 
-	        for (Celda c : celdas) {
-	            switch (c.getDisponibilidad()) {
-	                case DISPONIBLE:
-	                    disponibles++;
-	                    break;
-	                case OCUPADA:
-	                    ocupadas++;
-	                    break;
-	                case MANTENIMIENTO:
-	                    mantenimiento++;
-	                    break;
-	            }
-	        }
+		return reporte;
+	}
+	public int getCantidadTrabajadores() {
+		return trabajadores.size();
+	}
 
-	        double pDisponibles = (disponibles * 100.0) / total;
-	        double pOcupadas = (ocupadas * 100.0) / total;
-	        double pMantenimiento = (mantenimiento * 100.0) / total;
+	public int getCantidadCeldas() {
+		return celdas.size();
+	}
 
-	        return String.format(
-	            "Total Celdas: %d%nDisponibles: %d (%.2f%%)%nOcupadas: %d (%.2f%%)%nEn mantenimiento: %d (%.2f%%)",
-	            total, disponibles, pDisponibles, ocupadas, pOcupadas, mantenimiento, pMantenimiento);
-	    }
-	    public ArrayList<String> getReporteSuperpoblacionEspecies() {
-	        ArrayList<String> reporte = new ArrayList<>();
-	        Map<Especie, Integer> conteoPorEspecie = new HashMap<>();
+	public int getCantidadEspecies() {
+		return especies.size();
+	}
 
-	        for (Animal animal : animales) {
-	            Especie especie = animal.getEspecie();
-	            conteoPorEspecie.put(especie, conteoPorEspecie.getOrDefault(especie, 0) + 1);
-	        }
+	public int getCantidadAnimales() {
+		return animales.size();
+	}
 
-	        for (Especie especie : conteoPorEspecie.keySet()) {
-	            int cantidadAnimales = conteoPorEspecie.get(especie);
-	            int capacidadCompatible = 0;
 
-	            for (Celda celda : celdas) {
-	                if (celda.esCompatibleCon(especie)) {
-	                	capacidadCompatible += celda.getCapacidadTotal();
-	                }
-	            }
+	public void agregarCuidador(Cuidador c) {
+	    if (c == null)
+	        throw new IllegalArgumentException("El cuidador no puede ser nulo.");
+	    if (cuidadores.contains(c))
+	        throw new IllegalArgumentException("El cuidador ya existe.");
 
-	            double porcentaje = capacidadCompatible == 0 ? 0 : (cantidadAnimales * 100.0 / capacidadCompatible);
-	            String estado;
+	    trabajadores.add(c);
+	    cuidadores.add(c);
+	}
 
-	            if (porcentaje <= 60) {
-	                estado = "Estable";
-	            } else if (porcentaje <= 85) {
-	                estado = "En riesgo";
-	            } else {
-	                estado = "Superpoblado";
-	            }
+	public boolean eliminarCuidadores(Cuidador c) {
+	    if (c == null)
+	        throw new IllegalArgumentException("El cuidador no puede ser nulo.");
+	    if (c.getCeldaAsignada1() != null)
+	        c.getCeldaAsignada1().getCuidadores().remove(c);
+	    if (c.getCeldaAsignada2() != null)
+	        c.getCeldaAsignada2().getCuidadores().remove(c);
+		cuidadores.remove(c);
+		return eliminarTrabajador(c);
+	}
 
-	            reporte.add(String.format(
-	                "Especie: %s - %d animales / %d capacidad (%.2f%%) → %s",
-	                especie.getNombreComun(), cantidadAnimales, capacidadCompatible, porcentaje, estado
-	            ));
-	        }
+	public ArrayList<Cuidador> getCuidadores() {
+		return cuidadores;
+	}
+	public ArrayList<Veterinario> getVeterinarios() {
+		ArrayList<Veterinario> lista = new ArrayList<>();
+		for (Trabajador t : trabajadores) {
+			if (t instanceof Veterinario) {
+				lista.add((Veterinario) t);
+			}
+		}
+		return lista;
+	}
 
-	        if (reporte.isEmpty()) {
-	            reporte.add("No hay animales registrados en el zoológico.");
-	        }
+	public ArrayList<Administrativo> getAdministrativos() {
+		ArrayList<Administrativo> lista = new ArrayList<>();
+		for (Trabajador t : trabajadores) {
+			if (t instanceof Administrativo) {
+				lista.add((Administrativo) t);
+			}
+		}
+		return lista;
+	}
 
-	        return reporte;
-	    }
-	    public int getCantidadTrabajadores() {
-	        return trabajadores.size();
-	    }
+	public ArrayList<Custodio> getCustodios() {
+		ArrayList<Custodio> lista = new ArrayList<>();
+		for (Trabajador t : trabajadores) {
+			if (t instanceof Custodio) {
+				lista.add((Custodio) t);
+			}
+		}
+		return lista;
+	}
 
-	    public int getCantidadCeldas() {
-	        return celdas.size();
-	    }
+	public ArrayList<Servicio> getServicios() {
+		ArrayList<Servicio> lista = new ArrayList<>();
+		for (Trabajador t : trabajadores) {
+			if (t instanceof Servicio) {
+				lista.add((Servicio) t);
+			}
+		}
+		return lista;
+	}
+	public boolean eliminarCuidador(Cuidador cuidador) {
+		if (cuidador == null) throw new IllegalArgumentException("El cuidador no puede ser nulo.");
+		if (cuidador.getCeldaAsignada1() != null) cuidador.getCeldaAsignada1().getCuidadores().remove(cuidador);
+		if (cuidador.getCeldaAsignada2() != null) cuidador.getCeldaAsignada2().getCuidadores().remove(cuidador);
+		return trabajadores.remove(cuidador);
+	}
 
-	    public int getCantidadEspecies() {
-	        return especies.size();
-	    }
+	public boolean eliminarVeterinario(Veterinario v) {
+		if (v == null) throw new IllegalArgumentException("El veterinario no puede ser nulo.");
+		return trabajadores.remove(v);
+	}
 
-	    public int getCantidadAnimales() {
-	        return animales.size();
-	    }
+	public boolean eliminarAdministrativo(Administrativo a) {
+		if (a == null) throw new IllegalArgumentException("El administrativo no puede ser nulo.");
+		return trabajadores.remove(a);
+	}
 
-	    public ArrayList<Cuidador> getCuidadores() {
-	        ArrayList<Cuidador> lista = new ArrayList<>();
-	        for (Trabajador t : trabajadores) {
-	            if (t instanceof Cuidador) {
-	                lista.add((Cuidador) t);
-	            }
-	        }
-	        return lista;
-	    }
+	public boolean eliminarCustodio(Custodio c) {
+		if (c == null) throw new IllegalArgumentException("El custodio no puede ser nulo.");
+		return trabajadores.remove(c);
+	}
 
-	    public ArrayList<Veterinario> getVeterinarios() {
-	        ArrayList<Veterinario> lista = new ArrayList<>();
-	        for (Trabajador t : trabajadores) {
-	            if (t instanceof Veterinario) {
-	                lista.add((Veterinario) t);
-	            }
-	        }
-	        return lista;
-	    }
+	public boolean eliminarServicio(Servicio s) {
+		if (s == null) throw new IllegalArgumentException("El trabajador de servicio no puede ser nulo.");
+		return trabajadores.remove(s);
+	}
 
-	    public ArrayList<Administrativo> getAdministrativos() {
-	        ArrayList<Administrativo> lista = new ArrayList<>();
-	        for (Trabajador t : trabajadores) {
-	            if (t instanceof Administrativo) {
-	                lista.add((Administrativo) t);
-	            }
-	        }
-	        return lista;
-	    }
-
-	    public ArrayList<Custodio> getCustodios() {
-	        ArrayList<Custodio> lista = new ArrayList<>();
-	        for (Trabajador t : trabajadores) {
-	            if (t instanceof Custodio) {
-	                lista.add((Custodio) t);
-	            }
-	        }
-	        return lista;
-	    }
-
-	    public ArrayList<Servicio> getServicios() {
-	        ArrayList<Servicio> lista = new ArrayList<>();
-	        for (Trabajador t : trabajadores) {
-	            if (t instanceof Servicio) {
-	                lista.add((Servicio) t);
-	            }
-	        }
-	        return lista;
-	    }
-	    public boolean eliminarCuidador(Cuidador cuidador) {
-	        if (cuidador == null) throw new IllegalArgumentException("El cuidador no puede ser nulo.");
-	        if (cuidador.getCeldaAsignada1() != null) cuidador.getCeldaAsignada1().getCuidadores().remove(cuidador);
-	        if (cuidador.getCeldaAsignada2() != null) cuidador.getCeldaAsignada2().getCuidadores().remove(cuidador);
-	        return trabajadores.remove(cuidador);
-	    }
-
-	    public boolean eliminarVeterinario(Veterinario v) {
-	        if (v == null) throw new IllegalArgumentException("El veterinario no puede ser nulo.");
-	        return trabajadores.remove(v);
-	    }
-
-	    public boolean eliminarAdministrativo(Administrativo a) {
-	        if (a == null) throw new IllegalArgumentException("El administrativo no puede ser nulo.");
-	        return trabajadores.remove(a);
-	    }
-
-	    public boolean eliminarCustodio(Custodio c) {
-	        if (c == null) throw new IllegalArgumentException("El custodio no puede ser nulo.");
-	        return trabajadores.remove(c);
-	    }
-
-	    public boolean eliminarServicio(Servicio s) {
-	        if (s == null) throw new IllegalArgumentException("El trabajador de servicio no puede ser nulo.");
-	        return trabajadores.remove(s);
-	    }
-	    
 }

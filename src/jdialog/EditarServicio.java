@@ -63,6 +63,7 @@ public class EditarServicio extends JDialog {
 			textFieldCarnet = new JTextField();
 			textFieldCarnet.setColumns(10);
 			textFieldCarnet.setBounds(373, 129, 186, 32);
+			textFieldCarnet.setEditable(false);
 			contentPanel.add(textFieldCarnet);
 		}
 		{
@@ -110,11 +111,13 @@ public class EditarServicio extends JDialog {
 		try {
 			String nombre = textFieldNombre.getText().trim();
 			String zona = textFieldZona.getText().trim();
+			String CI = textFieldCarnet.getText().trim();
 
 			if (nombre.isEmpty() || zona.isEmpty()) {
 				throw new IllegalArgumentException("Todos los campos deben estar completos.");
 			}
 
+			servicio.setNumCarnet(CI);
 			servicio.setNombre(nombre);
 			servicio.setZona(zona);
 
@@ -131,6 +134,7 @@ public class EditarServicio extends JDialog {
 	private void gardarCambios() {
 		textFieldNombre.setText(servicio.getNombre());
         textFieldCarnet.setText(servicio.getNumCarnet());
+        textFieldCarnet.setEditable(false);
         textFieldZona.setText(servicio.getZona());
     }
 }

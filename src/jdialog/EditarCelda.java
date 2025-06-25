@@ -63,6 +63,7 @@ public class EditarCelda extends JDialog {
 		
         txtId = new JTextField(celda.getId());
         txtId.setBounds(46, 117, 186, 32);
+        txtId.setEditable(false);
         contentPanel.add(txtId);
         txtId.setColumns(10);        
 
@@ -126,18 +127,23 @@ public class EditarCelda extends JDialog {
         try {
             String id = txtId.getText().trim();
             String capTotalStr = textFieldCapTotal.getText().trim();
+            Disponibilidad disponibilidad = (Disponibilidad) comboBoxDisponibilidad.getSelectedItem();
+            
 
             if (id.isEmpty() || capTotalStr.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+			if (disponibilidad == Disponibilidad.OCUPADA && celda.tieneCapacidad()) {
+            	JOptionPane.showMessageDialog(this,
+            		"No puedes marcar como OCUPADO una celda que aún tiene capacidad disponible.",
+            		"Error", JOptionPane.ERROR_MESSAGE);
+            	return;
+            }
 
             int capTotal = Integer.parseInt(capTotalStr);
-            Disponibilidad disponibilidad = (Disponibilidad) comboBoxDisponibilidad.getSelectedItem();
             TipoEntorno tipoEntorno = (TipoEntorno) comboBoxTipoEntorno.getSelectedItem();
 
-
-            celda.setId(id);
             celda.setCapacidadTotal(capTotal);
             celda.setDisponibilidad(disponibilidad);
             celda.setEntorno(tipoEntorno);

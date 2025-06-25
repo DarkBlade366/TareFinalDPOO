@@ -133,6 +133,13 @@ public class CrearCelda extends JDialog {
 	            Disponibilidad disponibilidad = (Disponibilidad) comboBoxDisponibilidad.getSelectedItem();
 	            TipoEntorno tipoEntorno = (TipoEntorno) comboBoxTipoEntorno.getSelectedItem();
 	            
+	            if (disponibilidad == Disponibilidad.OCUPADA && capTotal > 0) {
+	            	JOptionPane.showMessageDialog(this,
+	            		"No puedes crear una celda en estado OCUPADO si aún tiene capacidad disponible.",
+	            		"Error", JOptionPane.ERROR_MESSAGE);
+	            	return;
+	            }
+	            
 	            controlador.agregarCelda(id, disponibilidad, capTotal, tipoEntorno);
 				
 				ventanaPrincipal.actualizarTablaEspecie();

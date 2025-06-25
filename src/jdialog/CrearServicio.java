@@ -141,6 +141,7 @@ public class CrearServicio extends JDialog {
 		}
 	}
 	public void llenarCampos(String nombre, String carnet) {
+		textFieldCarnet.setEditable(false);
 	    textFieldNombre.setText(nombre);
 	    textFieldCarnet.setText(carnet);
 	}

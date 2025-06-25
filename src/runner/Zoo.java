@@ -98,7 +98,7 @@ public class Zoo extends JFrame {
 	private JTable tableCuidadores;
 	private Zoologico zoologico;
 	private JTable table;
-
+	
 	private DefaultTableModel modeloVet;
 	private JTable tablaVet;
 
@@ -303,10 +303,18 @@ public class Zoo extends JFrame {
 
 		for (int i = 0; i < cuidadores.size(); i++) {
 			Cuidador c = cuidadores.get(i);
+
+			String horario1 = c.getCeldaAsignada1() != null
+				? "Celda 1: " + c.getHoraInicio1() + ":00 - " + c.getHoraFin1() + ":00"
+				: "";
+			String horario2 = c.getCeldaAsignada2() != null
+				? " | Celda 2: " + c.getHoraInicio2() + ":00 - " + c.getHoraFin2() + ":00"
+				: "";
+
 			dataCuidadores[i][0] = c.getNumCarnet();
 			dataCuidadores[i][1] = c.getNombre();
 			dataCuidadores[i][2] = c.getHorasTrabajadas();
-			dataCuidadores[i][3] = c.getHoraInicio() + ":00 - " + c.getHoraFin() + ":00";
+			dataCuidadores[i][3] = horario1 + horario2;
 			dataCuidadores[i][4] = c.getCeldaAsignada1() != null ? c.getCeldaAsignada1().getId() : "Sin asignar";
 			dataCuidadores[i][5] = c.getCeldaAsignada2() != null ? c.getCeldaAsignada2().getId() : "Sin asignar";
 			dataCuidadores[i][6] = "Editar";
@@ -354,7 +362,7 @@ public class Zoo extends JFrame {
 		tableCuidadores.getTableHeader().setForeground(Color.BLACK);
 
 		JScrollPane scrollCuidadores = new JScrollPane(tableCuidadores);
-		scrollCuidadores.setBounds(50, 50, 1800, 850); 
+		scrollCuidadores.setBounds(50, 50, 1989, 850); 
 		Cuidador.add(scrollCuidadores);
 
 		JLabel LogoCuidador = new JLabel("");
@@ -1295,22 +1303,32 @@ public class Zoo extends JFrame {
 		}
 	}
 	public void actualizarTablaCuidadores() {
-		DefaultTableModel model = (DefaultTableModel) tableCuidadores.getModel();
-		model.setRowCount(0);
+	    DefaultTableModel model = (DefaultTableModel) tableCuidadores.getModel();
+	    model.setRowCount(0);
 
-		for (Cuidador c : zoologico.getCuidadores()) {
-			model.addRow(new Object[]{
-					c.getNumCarnet(),
-					c.getNombre(),
-					c.getHorasTrabajadas(),
-					c.getHoraInicio() + ":00 - " + c.getHoraFin() + ":00",
-					c.getCeldaAsignada1() != null ? c.getCeldaAsignada1().getId() : "Sin asignar",
-							c.getCeldaAsignada2() != null ? c.getCeldaAsignada2().getId() : "Sin asignar",
-									"Editar",
-									"Eliminar"
-			});
-		}
+	    for (Cuidador c : zoologico.getCuidadores()) {
+	        String horario1 = c.getCeldaAsignada1() != null
+	            ? "Celda 1: " + c.getHoraInicio1() + ":00 - " + c.getHoraFin1() + ":00"
+	            : "N/A";
+
+	        String horario2 = c.getCeldaAsignada2() != null
+	            ? " | Celda 2: " + c.getHoraInicio2() + ":00 - " + c.getHoraFin2() + ":00"
+	            : "";
+
+	        model.addRow(new Object[]{
+	            c.getNumCarnet(),
+	            c.getNombre(),
+	            c.getHorasTrabajadas(),
+	            horario1 + horario2,
+	            c.getCeldaAsignada1() != null ? c.getCeldaAsignada1().getId() : "Sin asignar",
+	            c.getCeldaAsignada2() != null ? c.getCeldaAsignada2().getId() : "Sin asignar",
+	            "Editar",
+	            "Eliminar"
+	        });
+	    }
+	    model.fireTableDataChanged();	    
 	}
+
 	public void actualizarTablaServicio() {
 		modeloServicio.setRowCount(0);
 		for (Servicio s : zoologico.getServicios()) {
@@ -1411,17 +1429,25 @@ public class Zoo extends JFrame {
 	    dialog.setVisible(true);
 	}
 	private void editarCuidador(Cuidador cuidador) {
-		ArrayList<Celda> disponibles = new ArrayList<>();
-		for (Celda c : zoologico.getTodasLasCeldas()) {
-			if (!c.equals(cuidador.getCeldaAsignada1()) && c.getCuidadores().size() < 2) {
-				disponibles.add(c);
-			}
-		}
-		disponibles.add(cuidador.getCeldaAsignada1()); 
+	    ArrayList<Celda> disponibles = new ArrayList<>();
+	    for (Celda c : zoologico.getTodasLasCeldas()) {
+	         if (!c.equals(cuidador.getCeldaAsignada1()) && c.getCuidadores().size() < 2) {
+	            disponibles.add(c);
+	        }
+	    }
 
-		EditarCuidador dialog = new EditarCuidador(cuidador, zoologico, disponibles, Zoo.this);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setVisible(true);
+	    if (cuidador.getCeldaAsignada1() != null) {
+	        disponibles.add(cuidador.getCeldaAsignada1());
+	    }
+
+	    if (disponibles.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "No hay celdas disponibles para editar este cuidador", "Advertencia", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+
+	    EditarCuidador dialog = new EditarCuidador(zoologico, disponibles, Zoo.this, cuidador);
+	    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	    dialog.setVisible(true);
 	}
 
 

@@ -101,7 +101,7 @@ public class EditarVeterinario extends JDialog {
 		
 		JLabel lblCeldas = new JLabel("CELDAS ATENDIDAS");
 		lblCeldas.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
-		lblCeldas.setBounds(21, 240, 200, 26);
+		lblCeldas.setBounds(21, 240, 250, 26);
 		contentPanel.add(lblCeldas);
 
 		listaModel = new DefaultListModel<>();

@@ -47,6 +47,11 @@ public class Celda {
 	public void setDisponibilidad(Disponibilidad disponibilidad) {
 		if (disponibilidad == null)
 			throw new IllegalArgumentException("La disponibilidad no puede ser nula.");
+
+		if (disponibilidad == Disponibilidad.OCUPADA && tieneCapacidad()) {
+			throw new IllegalArgumentException("La celda aún tiene capacidad disponible. No puede marcarse como OCUPADO.");
+		}
+
 		this.disponibilidad = disponibilidad;
 	}
 
@@ -70,24 +75,51 @@ public class Celda {
 		this.entorno = entorno;
 	}
 
-	public void agregarCuidador(Cuidador cuidador) {
-		if (cuidador == null)
-			throw new IllegalArgumentException("El cuidador no puede ser nulo.");
-		if (cuidadores.contains(cuidador))
-			throw new IllegalArgumentException("El cuidador ya está asignado a esta celda.");
+	public void agregarCuidador(Cuidador nuevoCuidador) {
+	    if (nuevoCuidador == null) 
+	    	throw new IllegalArgumentException("El cuidador no puede ser nulo.");
+	    if (cuidadores.contains(nuevoCuidador))
+	        throw new IllegalArgumentException("El cuidador ya está asignado a esta celda.");
 
-		int cantidadSolapados = 0;
-		for (Cuidador c : cuidadores) {
-			if (seSuperponen(c, cuidador)) {
-				cantidadSolapados++;
-				if (cantidadSolapados >= 2)
-					throw new IllegalArgumentException("No se pueden asignar más de 2 cuidadores en el mismo horario.");
-			}
-		}
-		cuidadores.add(cuidador);
+	    int inicioNuevo = -1;
+	    int finNuevo = -1;
+
+	    if (this.equals(nuevoCuidador.getCeldaAsignada1())) {
+	        inicioNuevo = nuevoCuidador.getHoraInicio1();
+	        finNuevo = nuevoCuidador.getHoraFin1();
+	    } else if (this.equals(nuevoCuidador.getCeldaAsignada2())) {
+	        inicioNuevo = nuevoCuidador.getHoraInicio2();
+	        finNuevo = nuevoCuidador.getHoraFin2();
+	    } else {
+	        throw new IllegalArgumentException("El cuidador no tiene esta celda asignada.");
+	    }
+
+	    int cantidadSolapados = 0;
+	    for (Cuidador c : cuidadores) {
+	        int inicioExistente = 0, finExistente = 0;
+	        if (this.equals(c.getCeldaAsignada1())) {
+	            inicioExistente = c.getHoraInicio1();
+	            finExistente = c.getHoraFin1();
+	        } else if (this.equals(c.getCeldaAsignada2())) {
+	            inicioExistente = c.getHoraInicio2();
+	            finExistente = c.getHoraFin2();
+	        } else {
+	            continue;
+	        }
+
+	        if (seSuperponen(inicioExistente, finExistente, inicioNuevo, finNuevo)) {
+	            cantidadSolapados++;
+	            if (cantidadSolapados >= 2) {
+	                throw new IllegalArgumentException("No se pueden asignar más de 2 cuidadores con horarios solapados.");
+	            }
+	        }
+	    }
+
+	    cuidadores.add(nuevoCuidador);
 	}
-	private boolean seSuperponen(Cuidador c1, Cuidador c2) {
-		return c1.getHoraInicio() < c2.getHoraFin() && c2.getHoraInicio() < c1.getHoraFin();
+
+	private boolean seSuperponen(int inicio1, int fin1, int inicio2, int fin2) {
+	    return inicio1 < fin2 && inicio2 < fin1;
 	}
 
 	public boolean tieneCapacidad() {
@@ -118,17 +150,24 @@ public class Celda {
 			throw new IllegalArgumentException("No se pueden mezclar animales con diferentes tipos de alimentación en la misma celda.");
 
 		animales.add(animal);
+
+		if (!tieneCapacidad()) {
+			this.disponibilidad = Disponibilidad.OCUPADA;
+		}
 	}
 
 	public int getCapacidadDisponible() {
 		return capacidadTotal - animales.size();
 	}
+
 	public ArrayList<Cuidador> getCuidadores() {
 		return cuidadores;
 	}
+
 	public boolean tieneAnimales() {
 		return !animales.isEmpty();
 	}
+
 	public ArrayList<Animal> getAnimales() {
 		return animales;
 	}
@@ -138,28 +177,80 @@ public class Celda {
 		return id + " (Cap disponible: " + getCapacidadDisponible() + "/" + capacidadTotal + ")";
 	}
 
-	public boolean puedeAgregarCuidador(int nuevoInicio, int nuevoFin) {
-		if (cuidadores.size() >= 2) {
-			return false;
-		}
+	public boolean puedeAgregarCuidador(Cuidador nuevo, int horaInicio, int horaFin) {
+	    for (Cuidador existente : cuidadores) {
+	        int inicioExistente, finExistente;
 
-		for (Cuidador c : cuidadores) {
-			int inicioExistente = c.getHoraInicio();
-			int finExistente = c.getHoraFin();
+	        if (existente.getCeldaAsignada1() != null && existente.getCeldaAsignada1().equals(this)) {
+	            inicioExistente = existente.getHoraInicio1();
+	            finExistente = existente.getHoraFin1();
+	        }
+	        else if (existente.getCeldaAsignada2() != null && existente.getCeldaAsignada2().equals(this)) {
+	            inicioExistente = existente.getHoraInicio2();
+	            finExistente = existente.getHoraFin2();
+	        } else {
+	            continue; 
+	        }
 
-			boolean solapan = !(nuevoFin <= inicioExistente || nuevoInicio >= finExistente);
-			if (solapan) {
-				return false;
-			}
-		}
-
-		return true;
+	        if (seSuperponen(horaInicio, horaFin, inicioExistente, finExistente)) {
+	            return false;
+	        }
+	    }
+	    return true;
 	}
+
+	public boolean puedeAgregarCuidadorExcluyendo(Cuidador cuidadorExcluido, int horaInicio, int horaFin) {
+	    for (Cuidador c : cuidadores) {
+	        if (c.equals(cuidadorExcluido)) continue;
+	        int inicioExistente, finExistente;
+
+	        if (c.getCeldaAsignada1() != null && c.getCeldaAsignada1().equals(this)) {
+	            inicioExistente = c.getHoraInicio1();
+	            finExistente = c.getHoraFin1();
+	        } else if (c.getCeldaAsignada2() != null && c.getCeldaAsignada2().equals(this)) {
+	            inicioExistente = c.getHoraInicio2();
+	            finExistente = c.getHoraFin2();
+	        } else {
+	            continue;
+	        }
+
+	        if (seSuperponen(horaInicio, horaFin, inicioExistente, finExistente)) {
+	            return false;
+	        }
+	    }
+	    return true;
+	}
+
+	public boolean puedeAgregarHorario(int horaInicio, int horaFin) {
+	    for (Cuidador c : cuidadores) {
+	        int inicioExistente = 0, finExistente = 0;
+	        if (c.getCeldaAsignada1() != null && c.getCeldaAsignada1().equals(this)) {
+	            inicioExistente = c.getHoraInicio1();
+	            finExistente = c.getHoraFin1();
+	        } else if (c.getCeldaAsignada2() != null && c.getCeldaAsignada2().equals(this)) {
+	            inicioExistente = c.getHoraInicio2();
+	            finExistente = c.getHoraFin2();
+	        } else {
+	            continue;
+	        }
+	        if (seSuperponen(horaInicio, horaFin, inicioExistente, finExistente)) {
+	            return false;
+	        }
+	    }
+	    return true;
+	}
+
 	public boolean eliminarAnimal(Animal animal) {
 		if (animal == null)
 			throw new IllegalArgumentException("El animal no puede ser nulo.");
-		return animales.remove(animal);
+		boolean eliminado = animales.remove(animal);
+
+		if (eliminado && disponibilidad != Disponibilidad.MANTENIMIENTO && tieneCapacidad()) {
+			this.disponibilidad = Disponibilidad.DISPONIBLE;
+		}
+		return eliminado;
 	}
+
 	public void removerCuidador(Cuidador cuidador) {
 		if (cuidador == null)
 			throw new IllegalArgumentException("El cuidador no puede ser nulo.");

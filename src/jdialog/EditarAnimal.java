@@ -101,6 +101,7 @@ public class EditarAnimal extends JDialog {
             textFieldId = new JTextField();
             textFieldId.setColumns(10);
             textFieldId.setBounds(52, 86, 186, 32);
+            textFieldId.setEditable(false); 
             contentPanel.add(textFieldId);
         }
         {
@@ -176,7 +177,7 @@ public class EditarAnimal extends JDialog {
     }
 
     private void cargarDatosAnimal() {
-        textFieldId.setText(String.valueOf(animal.getId()));
+        textFieldId.setText(String.valueOf(animal.getId()));	 
         comboBoxSexo.setSelectedItem(animal.getSexo());
         comboBoxEspecie.setSelectedItem(animal.getEspecie());
         comboBoxCelda.setSelectedItem(animal.getCelda());
@@ -201,7 +202,6 @@ public class EditarAnimal extends JDialog {
             Date fechaDate = (Date) spinnerNacimiento.getValue();
             LocalDate nuevaFecha = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            animal.setId(nuevoId);
             animal.setSexo(nuevoSexo);
             animal.setNacimiento(nuevaFecha);
 

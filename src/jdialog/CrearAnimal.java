@@ -119,10 +119,18 @@ public class CrearAnimal extends JDialog {
 			ArrayList<Celda> celdasDisponibles = new ArrayList<>();
 
 			for (Celda c : celdas) {
-			    if (c.getDisponibilidad() == Disponibilidad.DISPONIBLE) {
+				if (c.getDisponibilidad() == Disponibilidad.DISPONIBLE && c.tieneCapacidad()) {
 			        celdasDisponibles.add(c);
-			    }
+			    }			    
 			}
+			if (celdasDisponibles.isEmpty()) {
+		        JOptionPane.showMessageDialog(this,
+		            "No hay celdas disponibles para alojar animales (todas están en mantenimiento o llenas).",
+		            "Sin celdas disponibles",
+		            JOptionPane.WARNING_MESSAGE);
+		        dispose();
+		        return;
+		    }
 			
 			comboBoxCelda = new JComboBox<Celda>();
 			comboBoxCelda.setModel(new DefaultComboBoxModel<>(celdasDisponibles.toArray(new Celda[0])));	
