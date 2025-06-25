@@ -428,13 +428,12 @@ public class Zoo extends JFrame {
 		Veterinario.add(btnAgregarVeterinario);
 
 		String[] columnasVet = {
-				"CI", "Nombre", "Especialidad", "Celdas Atendidas",
-				"Añadir Celda", "Editar", "Eliminar"
+				"CI", "Nombre", "Especialidad", "Celdas Atendidas", "Editar", "Eliminar"
 		};
 		modeloVet = new DefaultTableModel(columnasVet, 0) {
 			@Override
 			public boolean isCellEditable(int row, int col) {
-				return col >= 4;
+				return col >= 3;
 			}
 		};
 		tablaVet = new JTable(modeloVet);
@@ -482,48 +481,12 @@ public class Zoo extends JFrame {
 					break;
 
 				case 4: 
-					ArrayList<Celda> disponibles = new ArrayList<>();
-					for (Celda c : zoologico.getTodasLasCeldas()) {
-						if (c.getAlimentacion() == vet.getEspecialidad()) {
-							boolean atendida = false;
-							for (Veterinario o : zoologico.getVeterinarios()) {
-								if (o.getCeldasAtendidas().contains(c)) {
-									atendida = true; break;
-								}
-							}
-							if (!atendida) disponibles.add(c);
-						}
-					}
-					if (disponibles.isEmpty()) {
-						JOptionPane.showMessageDialog(Zoo.this,
-								"No hay celdas libres para esa especialidad.",
-								"Aviso", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					JComboBox<Celda> combo = new JComboBox<>(disponibles.toArray(new Celda[0]));
-					int ok = JOptionPane.showConfirmDialog(Zoo.this, combo,
-							"Agregar celda a " + vet.getNombre(),
-							JOptionPane.OK_CANCEL_OPTION);
-					if (ok == JOptionPane.OK_OPTION) {
-						Celda elegida = (Celda) combo.getSelectedItem();
-						try {
-							vet.agregarCeldaAtencion(elegida);
-							actualizarTablaVeterinarios();
-							actualizarResumen();
-						} catch (IllegalArgumentException ex) {
-							JOptionPane.showMessageDialog(Zoo.this,
-									ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-						}
-					}
-					break;
-
-				case 5: 
 					EditarVeterinario dlg = new EditarVeterinario(vet, zoologico, Zoo.this);
 					dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dlg.setVisible(true);
 					break;
 
-				case 6: 
+				case 5: 
 					int confirm = JOptionPane.showConfirmDialog(Zoo.this,
 							"¿Eliminar veterinario " + vet.getNombre() + "?",
 							"Confirmar eliminación", JOptionPane.YES_NO_OPTION);
@@ -1367,7 +1330,6 @@ public class Zoo extends JFrame {
 					v.getNombre(),
 					v.getEspecialidad().toString(),
 					"Ver Celdas", 
-					"Añadir Celda",
 					"Editar",
 					"Eliminar"
 			});

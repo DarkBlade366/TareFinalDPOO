@@ -56,7 +56,7 @@ public class EditarAnimal extends JDialog {
     private JSpinner spinnerNacimiento;
     private Zoo ventanaPrincipal;
 
-    public EditarAnimal(Zoologico controlador, Zoo ventanaPrincipal, Animal animal) {
+    public EditarAnimal(final Zoologico controlador, Zoo ventanaPrincipal, final Animal animal) {
         this.controlador = controlador;
         this.ventanaPrincipal = ventanaPrincipal;
         this.animal = animal;
@@ -116,6 +116,27 @@ public class EditarAnimal extends JDialog {
             comboBoxEspecie.setModel(new DefaultComboBoxModel<>(especies.toArray(new Especie[0])));
             comboBoxEspecie.setBounds(300, 228, 186, 32);
             contentPanel.add(comboBoxEspecie);
+            
+            comboBoxEspecie.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    Especie especieSeleccionada = (Especie) comboBoxEspecie.getSelectedItem();
+                    if (especieSeleccionada != null) {
+                        ArrayList<Celda> celdasCompatibles = new ArrayList<>();
+                        for (Celda celda : controlador.getTodasLasCeldas()) {
+                            if ((celda.getDisponibilidad() == Disponibilidad.DISPONIBLE || celda.equals(animal.getCelda())) &&
+                                celda.tieneCapacidad() &&
+                                celda.esCompatibleCon(especieSeleccionada)) {
+                                celdasCompatibles.add(celda);
+                            }
+                        }
+                        if (!celdasCompatibles.contains(animal.getCelda())) {
+                            celdasCompatibles.add(animal.getCelda());
+                        }
+                        comboBoxCelda.setModel(new DefaultComboBoxModel<>(celdasCompatibles.toArray(new Celda[0])));
+                        comboBoxCelda.setSelectedItem(animal.getCelda());
+                    }
+                }
+            });
         }
         {
             ArrayList<Celda> celdas = controlador.getTodasLasCeldas();
@@ -145,6 +166,7 @@ public class EditarAnimal extends JDialog {
         spinnerNacimiento.setBounds(310, 86, 179, 32);
         contentPanel.add(spinnerNacimiento);
 
+        comboBoxEspecie.setSelectedItem(animal.getEspecie());
         setLocationRelativeTo(null);
         {
             JPanel buttonPane = new JPanel();

@@ -56,7 +56,7 @@ public class CrearAnimal extends JDialog {
     private Zoo ventanaPrincipal;
 
 
-	public CrearAnimal(Zoologico controlador, Zoo ventanaPrincipal) {
+	public CrearAnimal(final Zoologico controlador, Zoo ventanaPrincipal) {
 		this.controlador = controlador;
 	    this.ventanaPrincipal = ventanaPrincipal;
 		
@@ -113,6 +113,31 @@ public class CrearAnimal extends JDialog {
 			comboBoxEspecie.setModel(new DefaultComboBoxModel<>(especies.toArray(new Especie[0])));	
 			comboBoxEspecie.setBounds(300, 228, 186, 32);
 			contentPanel.add(comboBoxEspecie);
+			
+			comboBoxEspecie.addActionListener(new ActionListener() {
+			    public void actionPerformed(ActionEvent e) {
+			        Especie especieSeleccionada = (Especie) comboBoxEspecie.getSelectedItem();
+			        if (especieSeleccionada != null) {
+			            ArrayList<Celda> celdasCompatibles = new ArrayList<>();
+			            for (Celda celda : controlador.getTodasLasCeldas()) {
+			                if (celda.getDisponibilidad() == Disponibilidad.DISPONIBLE &&
+			                    celda.tieneCapacidad() &&
+			                    celda.esCompatibleCon(especieSeleccionada)) {
+			                    celdasCompatibles.add(celda);
+			                }
+			            }
+
+			            if (celdasCompatibles.isEmpty()) {
+			                JOptionPane.showMessageDialog(CrearAnimal.this,
+			                    "No hay celdas disponibles compatibles con esta especie.",
+			                    "Sin celdas compatibles",
+			                    JOptionPane.WARNING_MESSAGE);
+			            }
+
+			            comboBoxCelda.setModel(new DefaultComboBoxModel<>(celdasCompatibles.toArray(new Celda[0])));
+			        }
+			    }
+			});
 		}
 		{
 			ArrayList<Celda> celdas = controlador.getTodasLasCeldas();
@@ -152,6 +177,7 @@ public class CrearAnimal extends JDialog {
 		spinner.setBounds(310, 86, 179, 32);
 		contentPanel.add(spinner);
 		
+		comboBoxEspecie.setSelectedIndex(0);
 		setLocationRelativeTo(null);
 		{
 			JPanel buttonPane = new JPanel();

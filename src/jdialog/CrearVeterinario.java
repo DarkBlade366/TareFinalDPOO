@@ -3,10 +3,13 @@ package jdialog;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import clases.Celda;
@@ -33,82 +36,86 @@ import runner.Zoo;
 public class CrearVeterinario extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private Zoologico controlador;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JComboBox<Celda> comboBoxCelda;
-	private JComboBox<Alimentacion> comboBoxEspecialidades;
-	private JButton okButton;
+	private JTextField txtNombre;
+	private JTextField txtCarnet;
+	private JComboBox<Alimentacion> cbEspecialidad;
+	private JComboBox<Celda> cbNuevaCelda;
+	private DefaultListModel<Celda> listaModel;
+	private JList<Celda> listCeldas;
+	private Zoologico zoo;
 	private Zoo ventanaPrincipal;
 
 
-	public CrearVeterinario(Zoologico controlador, Zoo ventanaPrincipal) {
-		this.controlador = controlador;
+	public CrearVeterinario(Zoologico zoo, Zoo ventanaPrincipal) {
+		this.zoo = zoo;
 		this.ventanaPrincipal = ventanaPrincipal;
 
+		setTitle("Crear Veterinario");
 		setBounds(100, 100, 606, 559);
+		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setLayout(null);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(null);
-		{
-			JLabel label = new JLabel("NOMBRE");
-			label.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
-			label.setBounds(21, 93, 168, 26);
-			contentPanel.add(label);
-		}
-		{
-			JLabel lblCarnet = new JLabel("CARNET");
-			lblCarnet.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
-			lblCarnet.setBounds(288, 93, 168, 26);
-			contentPanel.add(lblCarnet);
-		}
-		{
-			JLabel label = new JLabel("CELDAS ATENDIDAS");
-			label.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
-			label.setBounds(288, 251, 216, 26);
-			contentPanel.add(label);
-		}
-		{
-			JLabel lblEspecialidad = new JLabel("ESPECIALIDAD");
-			lblEspecialidad.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
-			lblEspecialidad.setBounds(21, 251, 168, 26);
-			contentPanel.add(lblEspecialidad);
-		}
-		{
-			textField = new JTextField();
-			textField.setColumns(10);
-			textField.setBounds(21, 141, 186, 32);
-			contentPanel.add(textField);
-		}
-		{
-			textField_1 = new JTextField();
-			textField_1.setColumns(10);
-			textField_1.setBounds(288, 141, 186, 32);
-			contentPanel.add(textField_1);
-		}
-		{
-			comboBoxEspecialidades = new JComboBox();
-			comboBoxEspecialidades.setModel(new DefaultComboBoxModel(Alimentacion.values()));	
-			comboBoxEspecialidades.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					actualizarComboBoxCeldas();
-				}
-			});
 
-			{
-				comboBoxCelda = new JComboBox();
-				comboBoxCelda.setBounds(288, 298, 243, 32);
-				contentPanel.add(comboBoxCelda);
+		JLabel lblNombre = new JLabel("NOMBRE");
+		lblNombre.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
+		lblNombre.setBounds(21, 42, 168, 26);
+		contentPanel.add(lblNombre);
+
+		txtNombre = new JTextField();
+		txtNombre.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		txtNombre.setBounds(21, 80, 250, 32);
+		contentPanel.add(txtNombre);
+
+		JLabel lblCarnet = new JLabel("CARNET");
+		lblCarnet.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
+		lblCarnet.setBounds(310, 42, 168, 26);
+		contentPanel.add(lblCarnet);
+
+		txtCarnet = new JTextField();
+		txtCarnet.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+		txtCarnet.setBounds(310, 80, 250, 32);
+		contentPanel.add(txtCarnet);
+
+		JLabel lblEspecialidad = new JLabel("ESPECIALIDAD");
+		lblEspecialidad.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
+		lblEspecialidad.setBounds(21, 140, 200, 26);
+		contentPanel.add(lblEspecialidad);
+
+		cbEspecialidad = new JComboBox<Alimentacion>();
+		cbEspecialidad.setModel(new DefaultComboBoxModel<Alimentacion>(Alimentacion.values()));
+		cbEspecialidad.setBounds(21, 178, 250, 32);
+		contentPanel.add(cbEspecialidad);
+
+		cbEspecialidad.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listaModel.clear();
+				refrescarComboCeldasDisponibles();
 			}
-			actualizarComboBoxCeldas();
+		});
 
-			comboBoxEspecialidades.setBounds(21, 298, 186, 32);
-			comboBoxEspecialidades.setSelectedIndex(0);
-			contentPanel.add(comboBoxEspecialidades);
-		}
+		JLabel lblCeldas = new JLabel("CELDAS ATENDIDAS");
+		lblCeldas.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
+		lblCeldas.setBounds(21, 240, 250, 26);
+		contentPanel.add(lblCeldas);
 
+		listaModel = new DefaultListModel<>();
+		listCeldas = new JList<>(listaModel);
+		listCeldas.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+		JScrollPane scrollList = new JScrollPane(listCeldas);
+		scrollList.setBounds(21, 280, 250, 150);
+		contentPanel.add(scrollList);
+
+		JLabel lblAgregar = new JLabel("AÑADIR CELDA");
+		lblAgregar.setFont(new Font("Segoe UI Black", Font.PLAIN, 21));
+		lblAgregar.setBounds(310, 240, 200, 26);
+		contentPanel.add(lblAgregar);
+
+		cbNuevaCelda = new JComboBox<>();
+		cbNuevaCelda.setBounds(310, 280, 250, 32);
+		contentPanel.add(cbNuevaCelda);
 
 		setLocationRelativeTo(null);
 		{
@@ -116,104 +123,96 @@ public class CrearVeterinario extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				okButton = new JButton("CREAR");
-				okButton.addActionListener(new ActionListener() {
+				JButton btnAdd = new JButton("AÑADIR");
+				btnAdd.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+				btnAdd.setBounds(310, 325, 120, 32);
+				btnAdd.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Celda sel = (Celda) cbNuevaCelda.getSelectedItem();
+						if (sel != null && !listaModel.contains(sel)) {
+							listaModel.addElement(sel);
+							refrescarComboCeldasDisponibles();
+						}
+					}
+				});
+				contentPanel.add(btnAdd);
+			}
+			{
+				JButton btnGuardar = new JButton("GUARDAR");
+				btnGuardar.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+				btnGuardar.setBounds(310, 380, 250, 40);
+				btnGuardar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						crearVeterinario();
 					}
 				});
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				contentPanel.add(btnGuardar);
 			}
 			{
-				JButton cancelButton = new JButton("CANCEL");
-				cancelButton.addActionListener(new ActionListener() {
+				JButton btnQuitar = new JButton("QUITAR");
+				btnQuitar.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+				btnQuitar.setBounds(21, 440, 250, 32);
+				btnQuitar.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Celda sel = listCeldas.getSelectedValue();
+						if (sel != null) {
+							listaModel.removeElement(sel);
+							refrescarComboCeldasDisponibles();
+						}
+					}
+				});
+				contentPanel.add(btnQuitar);
+			}
+			{
+				JButton btnCancelar = new JButton("CANCELAR");
+				btnCancelar.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+				btnCancelar.setBounds(310, 430, 250, 40);
+				btnCancelar.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dispose();
 					}
 				});
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
-			}
-		}
-	}
-	private void actualizarComboBoxCeldas() {
-		Alimentacion seleccion = (Alimentacion) comboBoxEspecialidades.getSelectedItem();
-		ArrayList<Celda> todas = controlador.getTodasLasCeldas();
-		ArrayList<Celda> celdasFiltradas = new ArrayList<>();
-		boolean hayAlgunaCeldaConAnimales = false;
-
-		for (Celda c : todas) {
-			if (c.tieneAnimales()) {
-				hayAlgunaCeldaConAnimales = true;
-				boolean tieneAnimalConAlimentacion = false;
-				for (Animal a : c.getAnimales()) {
-					if (a.getEspecie().getAlimentacion() == seleccion) {
-						tieneAnimalConAlimentacion = true;
-						break;
-					}
-				}
-				if (tieneAnimalConAlimentacion) {
-					celdasFiltradas.add(c);
-				}
+				contentPanel.add(btnCancelar);	
 			}
 		}
 
-		if (!hayAlgunaCeldaConAnimales) {
-			JOptionPane.showMessageDialog(this,
-					"No existen celdas con animales en el zoológico.",
-					"Error",
-					JOptionPane.ERROR_MESSAGE);
-			dispose();
-			return;
-		}
+		refrescarComboCeldasDisponibles();
+	}
 
-		if (celdasFiltradas.isEmpty()) {
-			JOptionPane.showMessageDialog(this,
-					"No existen celdas con animales de tipo: " + seleccion,
-					"Aviso",
-					JOptionPane.WARNING_MESSAGE);
-			comboBoxCelda.setModel(new DefaultComboBoxModel(new Celda[0]));
-		} else {
-			comboBoxCelda.setModel(new DefaultComboBoxModel<>(celdasFiltradas.toArray(new Celda[0])));
+	private void refrescarComboCeldasDisponibles() {
+		Alimentacion esp = (Alimentacion) cbEspecialidad.getSelectedItem();
+		cbNuevaCelda.removeAllItems();
+		for (Celda c : zoo.getTodasLasCeldas()) {
+			if (c.tieneAnimales()
+					&& c.getAlimentacion() == esp
+					&& !listaModel.contains(c)) {
+				cbNuevaCelda.addItem(c);
+			}
 		}
 	}
 
-
-
-	public void crearVeterinario() {
+	private void crearVeterinario() {
 		try {
-			String nombre = textField.getText().trim();
-			String carnet = textField_1.getText().trim();
-			Alimentacion especialidad = (Alimentacion) comboBoxEspecialidades.getSelectedItem();
+			String nombre = txtNombre.getText().trim();
+			String carnet = txtCarnet.getText().trim();
+			Alimentacion especialidad = (Alimentacion) cbEspecialidad.getSelectedItem();
 
-			if (comboBoxCelda.getItemCount() == 0) {
-				JOptionPane.showMessageDialog(this,
-						"No hay celdas disponibles para la especialidad seleccionada. Cree celdas primero.",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				return;
+			if (nombre.isEmpty() || carnet.isEmpty()) {
+				throw new IllegalArgumentException("Nombre y Carnet no pueden estar vacíos.");
 			}
 
-			Celda celdaSeleccionada = (Celda) comboBoxCelda.getSelectedItem();
-
-			if (celdaSeleccionada == null) {
-				JOptionPane.showMessageDialog(this,
-						"Debe seleccionar una celda para asignar al veterinario.",
-						"Error", JOptionPane.ERROR_MESSAGE);
-				return;
+			Veterinario nuevo = new Veterinario(nombre, carnet, especialidad);
+			for (int i = 0; i < listaModel.size(); i++) {
+				nuevo.agregarCeldaAtencion(listaModel.getElementAt(i));
 			}
 
-			Veterinario v = new Veterinario(nombre, carnet, especialidad);
-			v.agregarCeldaAtencion(celdaSeleccionada);
-
-			controlador.agregarTrabajador(v);
-			ventanaPrincipal.actualizarResumen();
+			zoo.agregarTrabajador(nuevo);
 			ventanaPrincipal.actualizarTablaVeterinarios();
-
+			ventanaPrincipal.actualizarResumen();
 			JOptionPane.showMessageDialog(this, "Veterinario creado exitosamente.");
 			dispose();
-
 		} catch (IllegalArgumentException ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
